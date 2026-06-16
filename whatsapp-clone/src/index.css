@@ -1,0 +1,168 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Layout & Responsiveness */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar {
+  width: 350px;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.main-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f4f4;
+  /* Removed background image for NIC theme */
+  background-size: contain;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+  }
+
+  .main-chat {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(100%);
+    z-index: 10;
+  }
+
+  .main-chat.active {
+    transform: translateX(0);
+  }
+
+  .sidebar.hidden {
+    /* Slide out slightly to the left for a parallax effect */
+    transform: translateX(-30%);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message-bubble {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Interactions */
+.contact-item {
+  transition: background-color 0.2s;
+}
+
+.contact-item:hover {
+  background-color: #f5f6f6 !important;
+}
+
+.action-btn {
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.mobile-back-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-back-btn {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+    color: #54656f;
+    padding: 0;
+  }
+}
+
+.contact-info-sidebar {
+  width: 350px;
+  background: #e8e8e8;
+  border-left: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideLeft 0.2s ease-out forwards;
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+  .contact-info-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 100%;
+    z-index: 20;
+  }
+}
+
+
+@media (min-width: 769px) {
+  .sidebar {
+    transition: width 0.3s ease;
+  }
+  .sidebar.minimized {
+    width: 0 !important;
+    overflow: hidden;
+    border-right: none;
+  }
+  .desktop-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    margin-right: 15px;
+    cursor: pointer;
+    color: #54656f;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  .desktop-toggle-btn:hover {
+    background: #e0e0e0;
+  }
+}
+@media (max-width: 768px) {
+  .desktop-toggle-btn {
+    display: none;
+  }
+}
+

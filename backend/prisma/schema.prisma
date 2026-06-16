@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique
+  password      String
+  firstName     String
+  lastName      String
+  officeName    String
+  photographUrl String?
+  role          String    @default("USER") // ADMIN or USER
+  sentMessages  Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  callerLogs    CallLog[] @relation("CallerLogs")
+  receiverLogs  CallLog[] @relation("ReceiverLogs")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  text       String?
+  fileUrl    String?
+  timestamp  DateTime @default(now())
+  senderId   Int
+  receiverId Int
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model CallLog {
+  id         Int      @id @default(autoincrement())
+  callerId   Int
+  receiverId Int
+  callType   String   // 'audio' or 'video'
+  status     String   // 'missed', 'rejected', 'answered'
+  startTime  DateTime @default(now())
+  duration   Int?     // duration in seconds
+  caller     User     @relation("CallerLogs", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceiverLogs", fields: [receiverId], references: [id], onDelete: Cascade)
+}
