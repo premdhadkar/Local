@@ -3,3 +3,6 @@ dist/
 .env
 .vite/
 uploads/
+backend/uploads/
+*.db
+backend/prisma/dev.db
