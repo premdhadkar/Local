@@ -418,7 +418,16 @@ function App() {
       }
       
       const pc = getPeerConnection(selectedUser.id);
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      stream.getTracks().forEach(track => {
+        const sender = pc.addTrack(track, stream);
+        if (track.kind === 'video') {
+          const params = sender.getParameters();
+          if (!params.encodings) { params.encodings = [{}]; }
+          params.encodings[0].maxBitrate = 50000000; // 50 Mbps max bitrate to prevent compression
+          params.encodings[0].scaleResolutionDownBy = 1;
+          sender.setParameters(params).catch(e => console.error("Error setting video params", e));
+        }
+      });
       
       const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: type === 'video' });
       await pc.setLocalDescription(offer);
@@ -457,7 +466,16 @@ function App() {
       }
       
       const pc = getPeerConnection(incomingCallData.from);
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      stream.getTracks().forEach(track => {
+        const sender = pc.addTrack(track, stream);
+        if (track.kind === 'video') {
+          const params = sender.getParameters();
+          if (!params.encodings) { params.encodings = [{}]; }
+          params.encodings[0].maxBitrate = 50000000; // 50 Mbps max bitrate to prevent compression
+          params.encodings[0].scaleResolutionDownBy = 1;
+          sender.setParameters(params).catch(e => console.error("Error setting video params", e));
+        }
+      });
       
       await pc.setRemoteDescription(new RTCSessionDescription(incomingCallData.signal));
       
@@ -507,7 +525,14 @@ function App() {
 
   const shareScreen = async () => {
     try {
-      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+        video: {
+          width: { ideal: 1920, max: 3840 },
+          height: { ideal: 1080, max: 2160 },
+          frameRate: { ideal: 60, max: 60 }
+        }, 
+        audio: true 
+      });
       screenStreamRef.current = screenStream;
       const screenTrack = screenStream.getVideoTracks()[0];
       const screenAudioTrack = screenStream.getAudioTracks()[0];
