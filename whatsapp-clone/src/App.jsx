@@ -55,6 +55,8 @@ function App() {
   
   const pendingCandidatesRef = useRef([]);
   const [isMuted, setIsMuted] = useState(false);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const screenStreamRef = useRef(null);
 
   const [socket, setSocket] = useState(null);
   const fileInputRef = useRef(null);
@@ -384,6 +386,11 @@ function App() {
       ringtoneRef.current.pause();
       ringtoneRef.current.currentTime = 0;
     }
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach(track => track.stop());
+      screenStreamRef.current = null;
+    }
+    setIsScreenSharing(false);
     setCallType('audio');
     callPeerIdRef.current = null;
   };
@@ -392,7 +399,8 @@ function App() {
     if (!selectedUser) return;
     try {
       setCallType(type);
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'video' });
+      const videoConstraints = type === 'video' ? { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 60 } } : false;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoConstraints });
       localStreamRef.current = stream;
       setCallState('calling');
       
@@ -426,7 +434,8 @@ function App() {
     try {
       const type = incomingCallData.callerInfo.callType || 'audio';
       setCallType(type);
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'video' });
+      const videoConstraints = type === 'video' ? { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 60 } } : false;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoConstraints });
       localStreamRef.current = stream;
       setCallState('in_call');
       
@@ -489,6 +498,41 @@ function App() {
       socket.emit('end_call', { to: callPeerIdRef.current });
     }
     endCallLocally();
+  };
+
+  const shareScreen = async () => {
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      screenStreamRef.current = screenStream;
+      const screenTrack = screenStream.getVideoTracks()[0];
+      
+      const sender = peerConnectionRef.current.getSenders().find(s => s.track.kind === 'video');
+      if (sender) {
+        sender.replaceTrack(screenTrack);
+      }
+      setIsScreenSharing(true);
+
+      screenTrack.onended = () => {
+        stopScreenShare();
+      };
+    } catch (err) {
+      console.error("Failed to share screen", err);
+    }
+  };
+
+  const stopScreenShare = () => {
+    if (localStreamRef.current && peerConnectionRef.current) {
+      const videoTrack = localStreamRef.current.getVideoTracks()[0];
+      const sender = peerConnectionRef.current.getSenders().find(s => s.track.kind === 'video');
+      if (sender && videoTrack) {
+        sender.replaceTrack(videoTrack);
+      }
+    }
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach(track => track.stop());
+      screenStreamRef.current = null;
+    }
+    setIsScreenSharing(false);
   };
 
   const handleSelectSearchUser = (u) => {
@@ -871,9 +915,13 @@ function App() {
       {/* WebRTC Media Output (Plays both audio and video) */}
       <video 
         ref={remoteMediaRef} 
-        style={callState === 'in_call' && callType === 'video' ? { 
-          display: 'block', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', objectFit: 'cover', zIndex: 998 
-        } : { 
+        style={callState === 'in_call' && callType === 'video' ? (
+          isScreenSharing ? {
+            display: 'block', position: 'fixed', bottom: '120px', left: '20px', width: '200px', height: '150px', objectFit: 'cover', borderRadius: '12px', zIndex: 998, boxShadow: '0 4px 12px rgba(0,0,0,0.3)', backgroundColor: '#333'
+          } : { 
+            display: 'block', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', objectFit: 'cover', zIndex: 998 
+          }
+        ) : { 
           width: '1px', height: '1px', opacity: 0, position: 'absolute', pointerEvents: 'none' 
         }} 
         autoPlay 
@@ -924,6 +972,11 @@ function App() {
                 </>
               )}
               <div style={{ display: 'flex', gap: '20px', pointerEvents: 'auto' }}>
+                {callType === 'video' && (
+                  <button onClick={isScreenSharing ? stopScreenShare : shareScreen} style={{ padding: '15px', background: isScreenSharing ? '#00a884' : '#333', color: 'white', border: 'none', borderRadius: '50%', fontSize: '20px', cursor: 'pointer', width: '60px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} title={isScreenSharing ? "Stop Sharing" : "Share Screen"}>
+                    🖥️
+                  </button>
+                )}
                 <button onClick={toggleMute} style={{ padding: '15px', background: isMuted ? '#ff3b30' : '#333', color: 'white', border: 'none', borderRadius: '50%', fontSize: '20px', cursor: 'pointer', width: '60px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} title="Toggle Mute">
                   {isMuted ? '🔇' : '🎤'}
                 </button>
