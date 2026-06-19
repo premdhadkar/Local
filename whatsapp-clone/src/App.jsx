@@ -656,13 +656,16 @@ function App() {
 
   if (!token) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#00a884' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#003366' }}>
         <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
-          <h2 style={{ textAlign: 'center', color: '#075E54' }}>WhatsApp Clone</h2>
+          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+            <img src="/nic-logo.png" alt="NIC Logo" style={{ height: '60px', objectFit: 'contain' }} />
+          </div>
+          <h2 style={{ textAlign: 'center', color: '#001f4d', marginTop: 0 }}>Gov-Comm NIC Messaging</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
-            <input style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} placeholder="Username (ID)" value={username} onChange={e => setUsername(e.target.value)} required />
-            <input style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-            <button style={{ padding: '10px', background: '#075E54', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }} type="submit">Login</button>
+            <input style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} placeholder="Username (ID)" value={username} onChange={e => setUsername(e.target.value)} required autoComplete="username" />
+            <input style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
+            <button style={{ padding: '10px', background: '#001f4d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }} type="submit">Login</button>
           </form>
         </div>
       </div>
@@ -675,6 +678,7 @@ function App() {
       <div className={`sidebar ${selectedUser && !isSettingsOpen ? 'hidden' : ''} ${isSidebarMinimized ? 'minimized' : ''}`}>
         <div style={{ background: '#f0f2f5', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/nic-logo.png" alt="NIC Logo" style={{ height: '35px', objectFit: 'contain', marginRight: '5px' }} />
             <div style={{ position: 'relative' }}>
               {user.photographUrl ? <img src={`${user.photographUrl}`} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} alt="profile" /> : <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ccc' }}></div>}
               <div style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', borderRadius: '50%', background: getStatusColor(user.id), border: '2px solid #f0f2f5' }}></div>
@@ -692,15 +696,15 @@ function App() {
             </div>
           </div>
           <div>
-            <button onClick={() => { setIsCallsOpen(true); setIsSettingsOpen(false); setIsSearching(false); fetchCallLogs(); }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#00a884', fontWeight: 'bold', marginRight: '10px' }}>📞 Calls</button>
-            <button onClick={openSettings} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#00a884', fontWeight: 'bold', marginRight: '10px' }}>⚙️ Profile</button>
+            <button onClick={() => { setIsCallsOpen(true); setIsSettingsOpen(false); setIsSearching(false); fetchCallLogs(); }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#003366', fontWeight: 'bold', marginRight: '10px' }}>📞 Calls</button>
+            <button onClick={openSettings} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#003366', fontWeight: 'bold', marginRight: '10px' }}>⚙️ Profile</button>
             <button onClick={handleLogout} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#555' }}>Logout</button>
           </div>
         </div>
         {isSettingsOpen ? (
           <div style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#fff' }}>
-            <button onClick={() => setIsSettingsOpen(false)} style={{ marginBottom: '20px', background: 'transparent', border: 'none', color: '#00a884', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
-            <h3 style={{ color: '#075E54', marginTop: 0 }}>Profile Settings</h3>
+            <button onClick={() => setIsSettingsOpen(false)} style={{ marginBottom: '20px', background: 'transparent', border: 'none', color: '#003366', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
+            <h3 style={{ color: '#001f4d', marginTop: 0 }}>Profile Settings</h3>
             <div style={{ marginBottom: '20px', padding: '15px', background: '#f0f2f5', borderRadius: '8px' }}>
               <div style={{ fontSize: '13px', color: '#666' }}>Your ID (Username)</div>
               <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111' }}>{user.username}</div>
@@ -714,13 +718,13 @@ function App() {
                 <label style={{ fontSize: '13px', color: '#666', display: 'block', marginBottom: '5px' }}>Update Profile Photo</label>
                 <input type="file" accept="image/*" onChange={e => setProfilePhoto(e.target.files[0])} />
               </div>
-              <button type="submit" style={{ padding: '10px', background: '#00a884', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Save Changes</button>
+              <button type="submit" style={{ padding: '10px', background: '#003366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Save Changes</button>
             </form>
           </div>
         ) : isCallsOpen ? (
           <div style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#fff' }}>
-            <button onClick={() => setIsCallsOpen(false)} style={{ marginBottom: '20px', background: 'transparent', border: 'none', color: '#00a884', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
-            <h3 style={{ color: '#075E54', marginTop: 0 }}>Call History</h3>
+            <button onClick={() => setIsCallsOpen(false)} style={{ marginBottom: '20px', background: 'transparent', border: 'none', color: '#003366', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
+            <h3 style={{ color: '#001f4d', marginTop: 0 }}>Call History</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               {callLogs.length === 0 ? <p style={{ color: '#666' }}>No recent calls.</p> : callLogs.map(log => {
                 const isIncoming = log.receiverId === user.id;
@@ -746,7 +750,7 @@ function App() {
           </div>
         ) : isSearching ? (
           <div style={{ background: '#fff', padding: '15px', borderBottom: '1px solid #e0e0e0' }}>
-            <button onClick={() => setIsSearching(false)} style={{ marginBottom: '10px', background: 'transparent', border: 'none', color: '#00a884', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
+            <button onClick={() => setIsSearching(false)} style={{ marginBottom: '10px', background: 'transparent', border: 'none', color: '#003366', cursor: 'pointer', fontWeight: 'bold' }}>&larr; Back to Chats</button>
             <input 
               style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box', marginBottom: '10px' }} 
               placeholder="Search by name..." 
@@ -766,7 +770,7 @@ function App() {
           </div>
         ) : (
           <div style={{ background: '#fff', padding: '10px 15px', borderBottom: '1px solid #e0e0e0' }}>
-            <button onClick={() => setIsSearching(true)} style={{ width: '100%', padding: '10px', background: '#00a884', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ New Chat</button>
+            <button onClick={() => setIsSearching(true)} style={{ width: '100%', padding: '10px', background: '#003366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ New Chat</button>
           </div>
         )}
 
@@ -840,7 +844,7 @@ function App() {
             {messages.map((m, i) => {
               const isMine = m.senderId === user.id;
               return (
-                <div key={i} className="message-bubble" style={{ alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '65%', background: isMine ? '#d9fdd3' : 'white', padding: '8px 12px', borderRadius: '8px', boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)', position: 'relative' }}>
+                <div key={i} className="message-bubble" style={{ alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '65%', background: isMine ? '#e6f0ff' : 'white', padding: '8px 12px', borderRadius: '8px', boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)', position: 'relative' }}>
                   {m.fileUrl && (
                     <div style={{ marginBottom: '5px' }}>
                       {m.fileUrl.match(/\.(webm|ogg|mp3|wav)$/i) ? (
@@ -914,7 +918,7 @@ function App() {
                 </div>
                 <div style={{ display: 'flex', gap: '15px' }}>
                   <button onClick={cancelRecording} style={{ background: 'transparent', border: 'none', color: '#555', cursor: 'pointer', fontSize: '15px' }}>Cancel</button>
-                  <button onClick={sendRecording} style={{ background: 'transparent', border: 'none', color: '#00a884', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' }}>Send</button>
+                  <button onClick={sendRecording} style={{ background: 'transparent', border: 'none', color: '#003366', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' }}>Send</button>
                 </div>
               </div>
             ) : (
@@ -935,9 +939,9 @@ function App() {
                 <form onSubmit={handleSend} style={{ flex: 1, display: 'flex', gap: '10px' }}>
                   <input style={{ flex: 1, padding: '12px 15px', borderRadius: '8px', border: 'none', outline: 'none' }} placeholder="Type a message or paste an image" value={newMessage} onChange={e => setNewMessage(e.target.value)} />
                   {newMessage.trim() || attachedFile ? (
-                    <button className="action-btn" type="submit" style={{ padding: '10px 20px', background: '#00a884', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Send</button>
+                    <button className="action-btn" type="submit" style={{ padding: '10px 20px', background: '#003366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Send</button>
                   ) : (
-                    <button type="button" onClick={startRecording} className="action-btn" style={{ padding: '10px', background: '#00a884', color: 'white', border: 'none', borderRadius: '50%', cursor: 'pointer', width: '42px', height: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '18px' }}>🎤</button>
+                    <button type="button" onClick={startRecording} className="action-btn" style={{ padding: '10px', background: '#003366', color: 'white', border: 'none', borderRadius: '50%', cursor: 'pointer', width: '42px', height: '42px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '18px' }}>🎤</button>
                   )}
                 </form>
               </>
@@ -1022,10 +1026,10 @@ function App() {
           {callState === 'receiving' && incomingCallData && (
             <>
               <div style={{ fontSize: '24px', marginBottom: '10px' }}>Incoming {incomingCallData.callerInfo.callType === 'video' ? 'Video' : 'Audio'} Call</div>
-              <div style={{ fontSize: '20px', marginBottom: '30px', color: '#00a884' }}>{incomingCallData.callerInfo.firstName} {incomingCallData.callerInfo.lastName}</div>
+              <div style={{ fontSize: '20px', marginBottom: '30px', color: '#003366' }}>{incomingCallData.callerInfo.firstName} {incomingCallData.callerInfo.lastName}</div>
               <div style={{ display: 'flex', gap: '20px', pointerEvents: 'auto' }}>
                 <button onClick={rejectCall} style={{ padding: '15px 30px', background: '#ff3b30', color: 'white', border: 'none', borderRadius: '30px', fontSize: '18px', cursor: 'pointer' }}>Reject</button>
-                <button onClick={answerCall} style={{ padding: '15px 30px', background: '#00a884', color: 'white', border: 'none', borderRadius: '30px', fontSize: '18px', cursor: 'pointer', animation: 'fadeIn 1s infinite alternate' }}>Accept</button>
+                <button onClick={answerCall} style={{ padding: '15px 30px', background: '#003366', color: 'white', border: 'none', borderRadius: '30px', fontSize: '18px', cursor: 'pointer', animation: 'fadeIn 1s infinite alternate' }}>Accept</button>
               </div>
             </>
           )}
@@ -1033,13 +1037,13 @@ function App() {
             <>
               {callType === 'audio' && (
                 <>
-                  <div style={{ fontSize: '24px', marginBottom: '20px', color: '#00a884' }}>In Call</div>
+                  <div style={{ fontSize: '24px', marginBottom: '20px', color: '#003366' }}>In Call</div>
                   <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', marginBottom: '30px' }}>📞</div>
                 </>
               )}
               <div style={{ display: 'flex', gap: '20px', pointerEvents: 'auto' }}>
                 {callType === 'video' && (
-                  <button onClick={isScreenSharing ? stopScreenShare : shareScreen} style={{ padding: '15px', background: isScreenSharing ? '#00a884' : '#333', color: 'white', border: 'none', borderRadius: '50%', fontSize: '20px', cursor: 'pointer', width: '60px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} title={isScreenSharing ? "Stop Sharing" : "Share Screen"}>
+                  <button onClick={isScreenSharing ? stopScreenShare : shareScreen} style={{ padding: '15px', background: isScreenSharing ? '#003366' : '#333', color: 'white', border: 'none', borderRadius: '50%', fontSize: '20px', cursor: 'pointer', width: '60px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} title={isScreenSharing ? "Stop Sharing" : "Share Screen"}>
                     🖥️
                   </button>
                 )}
