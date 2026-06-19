@@ -57,6 +57,7 @@ function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const screenStreamRef = useRef(null);
+  const mixedAudioContextRef = useRef(null);
 
   const [socket, setSocket] = useState(null);
   const fileInputRef = useRef(null);
@@ -390,6 +391,10 @@ function App() {
       screenStreamRef.current.getTracks().forEach(track => track.stop());
       screenStreamRef.current = null;
     }
+    if (mixedAudioContextRef.current) {
+      mixedAudioContextRef.current.close();
+      mixedAudioContextRef.current = null;
+    }
     setIsScreenSharing(false);
     setCallType('audio');
     callPeerIdRef.current = null;
@@ -502,14 +507,40 @@ function App() {
 
   const shareScreen = async () => {
     try {
-      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       screenStreamRef.current = screenStream;
       const screenTrack = screenStream.getVideoTracks()[0];
+      const screenAudioTrack = screenStream.getAudioTracks()[0];
       
-      const sender = peerConnectionRef.current.getSenders().find(s => s.track.kind === 'video');
-      if (sender) {
-        sender.replaceTrack(screenTrack);
+      const videoSender = peerConnectionRef.current.getSenders().find(s => s.track && s.track.kind === 'video');
+      if (videoSender) {
+        videoSender.replaceTrack(screenTrack);
       }
+
+      if (screenAudioTrack && localStreamRef.current) {
+        // Mix microphone and screen audio
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        mixedAudioContextRef.current = audioContext;
+
+        const dest = audioContext.createMediaStreamDestination();
+
+        const micTrack = localStreamRef.current.getAudioTracks()[0];
+        if (micTrack) {
+          const micSource = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
+          micSource.connect(dest);
+        }
+
+        const screenSource = audioContext.createMediaStreamSource(new MediaStream([screenAudioTrack]));
+        screenSource.connect(dest);
+
+        const mixedAudioTrack = dest.stream.getAudioTracks()[0];
+        
+        const audioSender = peerConnectionRef.current.getSenders().find(s => s.track && s.track.kind === 'audio');
+        if (audioSender) {
+          audioSender.replaceTrack(mixedAudioTrack);
+        }
+      }
+
       setIsScreenSharing(true);
 
       screenTrack.onended = () => {
@@ -523,14 +554,24 @@ function App() {
   const stopScreenShare = () => {
     if (localStreamRef.current && peerConnectionRef.current) {
       const videoTrack = localStreamRef.current.getVideoTracks()[0];
-      const sender = peerConnectionRef.current.getSenders().find(s => s.track.kind === 'video');
-      if (sender && videoTrack) {
-        sender.replaceTrack(videoTrack);
+      const videoSender = peerConnectionRef.current.getSenders().find(s => s.track && s.track.kind === 'video');
+      if (videoSender && videoTrack) {
+        videoSender.replaceTrack(videoTrack);
+      }
+
+      const audioTrack = localStreamRef.current.getAudioTracks()[0];
+      const audioSender = peerConnectionRef.current.getSenders().find(s => s.track && s.track.kind === 'audio');
+      if (audioSender && audioTrack) {
+        audioSender.replaceTrack(audioTrack);
       }
     }
     if (screenStreamRef.current) {
       screenStreamRef.current.getTracks().forEach(track => track.stop());
       screenStreamRef.current = null;
+    }
+    if (mixedAudioContextRef.current) {
+      mixedAudioContextRef.current.close();
+      mixedAudioContextRef.current = null;
     }
     setIsScreenSharing(false);
   };
